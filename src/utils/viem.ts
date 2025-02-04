@@ -3,10 +3,15 @@ import { baseSepolia } from 'viem/chains';
 import { CONTRACT_ABI, CONTRACT_ADDRESS } from './constants';
 import type { ContractPost } from './types';
 
-export const walletClient = createWalletClient({
-  chain: baseSepolia,
-  transport: custom(window.ethereum!)
-});
+export const walletClient = typeof window.ethereum !== 'undefined'
+  ? createWalletClient({
+    chain: baseSepolia,
+    transport: custom(window.ethereum)
+  })
+  : createWalletClient({
+    chain: baseSepolia,
+    transport: http()
+  });
 
 const client = createPublicClient({
   chain: baseSepolia,
