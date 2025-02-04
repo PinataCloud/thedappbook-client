@@ -1,4 +1,4 @@
-import { createPublicClient, createWalletClient, custom } from 'viem';
+import { createPublicClient, createWalletClient, custom, http } from 'viem';
 import { baseSepolia } from 'viem/chains';
 import { CONTRACT_ABI, CONTRACT_ADDRESS } from './constants';
 import type { ContractPost } from './types';
@@ -10,7 +10,7 @@ export const walletClient = createWalletClient({
 
 const client = createPublicClient({
   chain: baseSepolia,
-  transport: custom(window.ethereum!),
+  transport: http(),
 });
 
 const contractConfig = {
@@ -19,7 +19,6 @@ const contractConfig = {
 };
 
 export const getAllPosts = async (): Promise<ContractPost[]> => {
-  if (!window.ethereum) throw new Error("No ethereum provider found");
   const data = await client.readContract({
     ...contractConfig,
     functionName: 'getAllPosts',
@@ -28,7 +27,6 @@ export const getAllPosts = async (): Promise<ContractPost[]> => {
 };
 
 export const getTotalPosts = async (): Promise<bigint> => {
-  if (!window.ethereum) throw new Error("No ethereum provider found");
   const data = await client.readContract({
     ...contractConfig,
     functionName: 'getTotalPosts',
