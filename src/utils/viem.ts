@@ -1,15 +1,15 @@
 import { createPublicClient, createWalletClient, custom } from 'viem';
-import { sepolia } from 'viem/chains';
+import { baseSepolia } from 'viem/chains';
 import { CONTRACT_ABI, CONTRACT_ADDRESS } from './constants';
 import type { ContractPost } from './types';
 
 export const walletClient = createWalletClient({
-  chain: sepolia,
+  chain: baseSepolia,
   transport: custom(window.ethereum!)
 });
 
 const client = createPublicClient({
-  chain: sepolia,
+  chain: baseSepolia,
   transport: custom(window.ethereum!),
 });
 
@@ -45,5 +45,9 @@ export const createPost = async (message: string): Promise<`0x${string}`> => {
     args: [message],
     account,
   });
-  return walletClient.writeContract(request);
+  const hash = await walletClient.writeContract(request);
+  const receipt = await client.waitForTransactionReceipt({
+    hash
+  })
+  return receipt.transactionHash
 };

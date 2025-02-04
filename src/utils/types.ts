@@ -15,5 +15,6 @@ export interface ContractPost {
 export interface Post {
   poster: string;
   message: string;
+  imageUrl: string | null;
   timestamp: string;
 }
