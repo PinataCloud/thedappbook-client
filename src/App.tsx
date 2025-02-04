@@ -11,12 +11,19 @@ export function App() {
   const [error, setError] = useState<string>('');
   const [account, setAccount] = useState<string>('');
   const [totalPosts, setTotalPosts] = useState<number>(0);
+  const [hasWallet, setHasWallet] = useState<boolean>(true);
 
   useEffect(() => {
     loadPosts();
+    if (typeof window.ethereum === 'undefined') {
+      setHasWallet(false);
+      setError('Please install a Web3 wallet like Coinbase Wallet to interact with this app');
+    }
   }, []);
 
   async function connectWallet(): Promise<void> {
+    if (!hasWallet) return;
+
     try {
       const [address] = await walletClient.requestAddresses();
       setAccount(address);
