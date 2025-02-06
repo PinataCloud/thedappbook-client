@@ -1,50 +1,61 @@
-# React + TypeScript + Vite
+## thedappbook - Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![cover](https://dweb.mypinata.cloud/ipfs/bafkreih24voz7rvhcugw66ulsl7lpmk7sekq2s52anuezuaykb7qt4swo4)
 
-Currently, two official plugins are available:
+A simple blockchain application using smart contracts and IPFS
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Overview
 
-## Expanding the ESLint configuration
+thedappbook allows users to connect their wallet and write posts on the decentralized wall. This happens through several components:
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- Smart Contracts - Works like a decentralized database that stores the messages and the address of the user who posted them. Blockchain data is too expensive to store full res images, so instead it stores an IPFS CID that points to the content offchain.
+- Server - Handles generating temporary Pinata API Keys to upload images and JSON content that can be consumed by the client.
+- Client - The hosted web UI that the end user connects their wallet with and writes a message to the smart contract.
 
-- Configure the top-level `parserOptions` property like this:
+## The Client
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+This particular repo handles the client interactivity. The overal flow of the data and UX is as follows:
+- User connects their wallet
+- User writes a message in the text box and selects an image to upload
+- Form is submitted
+  - The client will make a request for a temproary API key from the Server
+  - API key is used to upload the image first, and then uploads a JSON file with the message and the image reference
+  - Upload of the JSON file returns a CID
+- User is prompted with a transaction in their wallet to write the previously return JSON CID to the smart contract. Since it is a write action it requires some eth to pay gas fees.
+- If the transaction is successful it will reload the posts and fetch the latest posts from the contract
+
+## Development
+
+Clone the repo and install the dependencies
+
+```bash
+git clone https://github.com/PinataCloud/thedappbook-client
+cd thedappbook-client
+npm install
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+Once the dependencies are installed start up the dev server
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+```bash
+npm run dev
 ```
+
+Please reference the structure below to get a feel where things are
+```
+src
+├── App.tsx // Main app and logic
+├── assets
+│   └── react.svg
+├── index.css
+├── main.tsx
+├── utils
+│   ├── constants.ts // Smart contract address and ABI
+│   ├── pinata.ts // Pinata Uploads to IPFS
+│   ├── types.ts // Types
+│   └── viem.ts // Smart contract functions
+└── vite-env.d.ts
+```
+
+## Questions?
+
+Feel free to reach out over [Discord](https://discord.gg/pinata) or [Email](mailto:steve@pinata.cloud)!
