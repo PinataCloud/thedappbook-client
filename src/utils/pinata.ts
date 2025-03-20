@@ -5,15 +5,26 @@ export const pinata = new PinataSDK({
   pinataGateway: "dweb.mypinata.cloud"
 })
 
-export async function uploadData(message: string, file?: File) {
+async function getUploadUrl() {
   try {
-    const keyReq = await fetch("https://api.thedappbook.com/keys", {
+    const signedUrlReq = await fetch("https://api.thedappbook.com/signedUpload", {
       method: "POST"
     })
-    const keyRes = await keyReq.json()
+    const url = await signedUrlReq.json()
+    return url.data
+  } catch (error) {
+    console.log(error)
+    return error
+  }
+}
 
-    if (!keyReq.ok) {
-      console.log("Problem fetching key")
+export async function uploadData(message: string, file?: File) {
+  try {
+
+    const url = await getUploadUrl()
+
+    if (!url) {
+      console.log("Problem fetching presigned upload url")
     }
 
     let imageUrl: string = ""
@@ -21,14 +32,20 @@ export async function uploadData(message: string, file?: File) {
     if (file) {
       const fileUpload = await pinata.upload.public
         .file(file)
-        .key(keyRes.data as unknown as string)
+        .url(url)
       imageUrl = await pinata.gateways.public.convert(fileUpload.cid)
+    }
+
+    const urlJson = await getUploadUrl()
+
+    if (!urlJson.ok) {
+      console.log("Problem fetching presigned upload url")
     }
 
     const { cid: uri } = await pinata.upload.public.json({
       message,
       imageUrl
-    }).key(keyRes.data)
+    }).url(urlJson)
 
     return uri
   } catch (error) {
