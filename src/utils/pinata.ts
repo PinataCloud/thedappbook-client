@@ -1,4 +1,4 @@
-import { PinataSDK } from "pinata-web3";
+import { PinataSDK } from "pinata";
 
 export const pinata = new PinataSDK({
   pinataJwt: "",
@@ -19,13 +19,13 @@ export async function uploadData(message: string, file?: File) {
     let imageUrl: string = ""
 
     if (file) {
-      const fileUpload = await pinata.upload
+      const fileUpload = await pinata.upload.public
         .file(file)
         .key(keyRes.data as unknown as string)
-      imageUrl = await pinata.gateways.convert(fileUpload.IpfsHash)
+      imageUrl = await pinata.gateways.public.convert(fileUpload.cid)
     }
 
-    const { IpfsHash: uri } = await pinata.upload.json({
+    const { cid: uri } = await pinata.upload.public.json({
       message,
       imageUrl
     }).key(keyRes.data)

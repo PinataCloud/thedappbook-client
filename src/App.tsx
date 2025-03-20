@@ -43,7 +43,7 @@ export function App() {
       const postsWithContent = await Promise.all(
         allPosts.map(async (post: ContractPost): Promise<Post> => {
           try {
-            const url = await pinata.gateways.convert(post.message)
+            const url = await pinata.gateways.public.convert(post.message)
             const response = await fetch(url);
             const content = await response.json();
             return {
